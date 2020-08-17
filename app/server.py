@@ -17,7 +17,7 @@ path = Path(__file__).parent
 
 app = Starlette()
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_headers=['X-Requested-With', 'Content-Type'])
-#app.mount('/static', StaticFiles(directory='app/static'))
+app.mount('/static', StaticFiles(directory='app/static'))
 
 
 async def download_file(url, dest):
@@ -51,7 +51,7 @@ loop.close()
 
 @app.route('/')
 async def homepage(request):
-    html_file = path / 'index.html'
+    html_file = path/ 'index.html'
     return HTMLResponse(html_file.open().read())
 
 
