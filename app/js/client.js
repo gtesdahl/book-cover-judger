@@ -31,7 +31,7 @@ function analyze() {
       var response = JSON.parse(e.target.responseText);
       var dict = {2: "High", 1: "Medium", 0: "Low"};
       var result_converted = dict[response["result"]]
-      el("result-label").innerHTML = `Result = ${result_converted} Number of Reviews`;
+      el("result-label").innerHTML = `Result = ${result_converted} Popularity`;
     }
     el("analyze-button").innerHTML = "Analyze";
   };
