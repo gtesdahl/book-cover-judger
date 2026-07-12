@@ -15,6 +15,13 @@ export_file_name = 'export.pkl'
 path = Path(__file__).parent
 model_path = path / 'models' / export_file_name
 
+# Training used pd.qcut tertiles: 0=low, 1=medium, 2=high ratings_count
+POPULARITY_LABELS = {
+    '0': 'Low',
+    '1': 'Medium',
+    '2': 'High',
+}
+
 learn = None
 
 
@@ -30,6 +37,13 @@ def get_learner():
     return learn
 
 
+def format_prediction(pred, pred_idx, probs):
+    raw = str(pred)
+    label = POPULARITY_LABELS.get(raw, raw)
+    confidence = round(float(probs[pred_idx]) * 100, 1)
+    return label, confidence, raw
+
+
 async def homepage(request):
     html_file = path / 'index.html'
     return HTMLResponse(html_file.read_text())
@@ -43,8 +57,13 @@ async def analyze(request):
     img_data = await request.form()
     img_bytes = await img_data['file'].read()
     img = open_image(BytesIO(img_bytes))
-    prediction = get_learner().predict(img)[0]
-    return JSONResponse({'result': str(prediction)})
+    pred, pred_idx, probs = get_learner().predict(img)
+    label, confidence, raw = format_prediction(pred, pred_idx, probs)
+    return JSONResponse({
+        'result': label,
+        'confidence': confidence,
+        'raw_class': raw,
+    })
 
 
 app = Starlette(

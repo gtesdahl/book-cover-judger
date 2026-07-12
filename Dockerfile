@@ -17,7 +17,8 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY app app/
 
-ARG MODEL_URL=https://www.dropbox.com/scl/fi/db8soppf7ythn2tall1jd/export.pkl?rlkey=uwqytzm6zc7rmj8jbowz9s222&dl=1
+# Book-cover model from capstone training repo (not the old Dropbox bird classifier)
+ARG MODEL_URL=https://raw.githubusercontent.com/gtesdahl/mlg-06-capstone/master/final_model_export.pkl
 RUN mkdir -p app/models \
     && curl -fsSL "$MODEL_URL" -o app/models/export.pkl \
     && python -c "from pathlib import Path; p=Path('app/models/export.pkl'); assert p.stat().st_size > 1_000_000, f'Model download failed ({p.stat().st_size} bytes)'"

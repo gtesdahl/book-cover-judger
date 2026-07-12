@@ -50,7 +50,9 @@ Open http://localhost:10000
 | `app/index.html` | Frontend UI |
 ## Model file
 
-The trained model (`export.pkl`, ~99MB) is **not stored in git**. It is downloaded automatically during the Docker build from Dropbox. This avoids Git LFS issues on Render.
+The trained model (`final_model_export.pkl`, ~84MB) is downloaded during the Docker build from the [capstone training repo](https://github.com/gtesdahl/mlg-06-capstone). This is the actual book-cover popularity classifier — not the old Dropbox file, which was a fast.ai bird demo model.
+
+Training labels are numeric tertiles (`0`, `1`, `2`) mapped to Low/Medium/High at inference time.
 | `Dockerfile` | Container for deployment |
 | `render.yaml` | Render free-tier config |
 
