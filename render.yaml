@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: book-cover-judger
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true

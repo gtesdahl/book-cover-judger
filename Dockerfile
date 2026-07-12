@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY app app/
 
-ENV PORT=7860
-EXPOSE 7860
+ENV PORT=10000
+EXPOSE 10000
 
 CMD ["python", "app/server.py"]
