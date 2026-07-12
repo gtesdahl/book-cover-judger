@@ -1,15 +1,29 @@
-# Starter for deploying [fast.ai](https://www.fast.ai) models on [Render](https://render.com)
+---
+title: Book Cover Judger
+emoji: 📚
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+license: mit
+app_port: 7860
+---
 
-This repo can be used as a starting point to deploy [fast.ai](https://github.com/fastai/fastai) models on Render.
+# Book Cover Judger
 
-The sample app described here is up at https://fastai-v3.onrender.com. Test it out with bear images!
+Upload a book cover image and predict its popularity (High, Medium, or Low) using a ResNet34 CNN trained with fastai on Goodreads data.
 
-You can test your changes locally by installing Docker and using the following command:
+Built as a capstone project for the Machine Learning Guild Apprentice Program.
 
+## Local development
+
+```bash
+docker build -t book-cover-judger .
+docker run --rm -p 7860:7860 book-cover-judger
 ```
-docker build -t fastai-v3 . && docker run --rm -it -p 5000:5000 fastai-v3
-```
 
-The guide for production deployment to Render is at https://course.fast.ai/deployment_render.html.
+Open http://localhost:7860
 
-Please use [Render's fast.ai forum thread](https://forums.fast.ai/t/deployment-platform-render/33953) for questions and support.
+## Original repository
+
+[github.com/gtesdahl/book-cover-judger](https://github.com/gtesdahl/book-cover-judger)

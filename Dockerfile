@@ -1,16 +1,22 @@
-FROM python:3.7-slim-stretch
+FROM python:3.10-slim-bookworm
 
-RUN apt-get update && apt-get install -y git python3-dev gcc \
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-
-RUN pip install --upgrade -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    --extra-index-url https://download.pytorch.org/whl/cpu
 
 COPY app app/
 
-RUN python app/server.py
+ENV PORT=7860
+EXPOSE 7860
 
-EXPOSE 5000
-
-CMD ["python", "app/server.py", "serve"]
+CMD ["python", "app/server.py"]

@@ -21,7 +21,8 @@ function analyze() {
   el("analyze-button").innerHTML = "Analyzing...";
   var xhr = new XMLHttpRequest();
   var loc = window.location;
-  xhr.open("POST", `${loc.protocol}//${loc.hostname}:${loc.port}/analyze`,
+  var port = loc.port ? `:${loc.port}` : "";
+  xhr.open("POST", `${loc.protocol}//${loc.hostname}${port}/analyze`,
     true);
   xhr.onerror = function() {
     alert(xhr.responseText);
@@ -29,9 +30,7 @@ function analyze() {
   xhr.onload = function(e) {
     if (this.readyState === 4) {
       var response = JSON.parse(e.target.responseText);
-      var dict = {2: "High", 1: "Medium", 0: "Low"};
-      var result_converted = dict[response["result"]]
-      el("result-label").innerHTML = `Prediction = ${result_converted} Popularity`;
+      el("result-label").innerHTML = `Prediction = ${response.result} Popularity`;
     }
     el("analyze-button").innerHTML = "Analyze";
   };
