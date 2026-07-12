@@ -5,21 +5,15 @@ from pathlib import Path
 import uvicorn
 from fastai.vision import load_learner, open_image
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse, JSONResponse
+from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
 export_file_name = 'export.pkl'
 path = Path(__file__).parent
 model_path = path / 'models' / export_file_name
-
-app = Starlette()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_headers=['X-Requested-With', 'Content-Type'],
-)
-app.mount('/static', StaticFiles(directory=path / 'static'))
 
 learn = None
 
@@ -36,24 +30,38 @@ def get_learner():
     return learn
 
 
-@app.route('/')
 async def homepage(request):
     html_file = path / 'index.html'
     return HTMLResponse(html_file.read_text())
 
 
-@app.route('/health')
 async def health(request):
     return JSONResponse({'status': 'ok'})
 
 
-@app.route('/analyze', methods=['POST'])
 async def analyze(request):
     img_data = await request.form()
     img_bytes = await img_data['file'].read()
     img = open_image(BytesIO(img_bytes))
     prediction = get_learner().predict(img)[0]
     return JSONResponse({'result': str(prediction)})
+
+
+app = Starlette(
+    routes=[
+        Route('/', homepage),
+        Route('/health', health),
+        Route('/analyze', analyze, methods=['POST']),
+        Mount('/static', StaticFiles(directory=path / 'static'), name='static'),
+    ],
+    middleware=[
+        Middleware(
+            CORSMiddleware,
+            allow_origins=['*'],
+            allow_headers=['X-Requested-With', 'Content-Type'],
+        ),
+    ],
+)
 
 
 if __name__ == '__main__':
