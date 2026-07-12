@@ -48,7 +48,9 @@ Open http://localhost:10000
 |------|---------|
 | `app/server.py` | Starlette API + model inference |
 | `app/index.html` | Frontend UI |
-| `app/models/export.pkl` | Trained fastai model (Git LFS) |
+## Model file
+
+The trained model (`export.pkl`, ~99MB) is **not stored in git**. It is downloaded automatically during the Docker build from Dropbox. This avoids Git LFS issues on Render.
 | `Dockerfile` | Container for deployment |
 | `render.yaml` | Render free-tier config |
 

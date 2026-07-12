@@ -1,5 +1,4 @@
 import os
-import sys
 from io import BytesIO
 from pathlib import Path
 
@@ -29,14 +28,12 @@ def get_learner():
     global learn
     if learn is None:
         if not model_path.exists():
-            raise FileNotFoundError(f'Model not found at {model_path}')
+            raise FileNotFoundError(
+                f'Model not found at {model_path}. '
+                'Ensure export.pkl is downloaded during the Docker build.'
+            )
         learn = load_learner(path / 'models', export_file_name)
     return learn
-
-
-@app.on_event('startup')
-async def startup():
-    get_learner()
 
 
 @app.route('/')

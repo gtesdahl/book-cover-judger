@@ -3,5 +3,6 @@ services:
     name: book-cover-judger
     runtime: docker
     plan: free
+    branch: master
     healthCheckPath: /health
     autoDeploy: true
