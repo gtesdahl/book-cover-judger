@@ -50,7 +50,13 @@ Open http://localhost:10000
 | `app/index.html` | Frontend UI |
 ## Model file
 
-The trained model (`final_model_export.pkl`, ~84MB) is downloaded during the Docker build from the [capstone training repo](https://github.com/gtesdahl/mlg-06-capstone). This is the actual book-cover popularity classifier — not the old Dropbox file, which was a fast.ai bird demo model.
+Production inference uses **ONNX Runtime** (`app/models/book_cover_model.onnx`, ~84MB) — lightweight enough for Render's free tier (512 MB RAM). The original fastai export lives in the [capstone training repo](https://github.com/gtesdahl/mlg-06-capstone).
+
+To regenerate the ONNX file from the capstone model:
+```bash
+pip install fastai==1.0.61 torch torchvision
+python scripts/export_onnx.py /path/to/final_model_export.pkl
+```
 
 Training labels are numeric tertiles (`0`, `1`, `2`) mapped to Low/Medium/High at inference time.
 | `Dockerfile` | Container for deployment |

@@ -1,47 +1,26 @@
 import os
-from io import BytesIO
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
-from fastai.vision import load_learner, open_image
 from starlette.applications import Starlette
+from starlette.concurrency import run_in_threadpool
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-export_file_name = 'export.pkl'
+from inference import get_session, predict
+
 path = Path(__file__).parent
-model_path = path / 'models' / export_file_name
-
-# Training used pd.qcut tertiles: 0=low, 1=medium, 2=high ratings_count
-POPULARITY_LABELS = {
-    '0': 'Low',
-    '1': 'Medium',
-    '2': 'High',
-}
-
-learn = None
 
 
-def get_learner():
-    global learn
-    if learn is None:
-        if not model_path.exists():
-            raise FileNotFoundError(
-                f'Model not found at {model_path}. '
-                'Ensure export.pkl is downloaded during the Docker build.'
-            )
-        learn = load_learner(path / 'models', export_file_name)
-    return learn
-
-
-def format_prediction(pred, pred_idx, probs):
-    raw = str(pred)
-    label = POPULARITY_LABELS.get(raw, raw)
-    confidence = round(float(probs[pred_idx]) * 100, 1)
-    return label, confidence, raw
+@asynccontextmanager
+async def lifespan(app):
+    # Warm up ONNX session at startup so first /analyze is fast
+    await run_in_threadpool(get_session)
+    yield
 
 
 async def homepage(request):
@@ -54,19 +33,21 @@ async def health(request):
 
 
 async def analyze(request):
-    img_data = await request.form()
-    img_bytes = await img_data['file'].read()
-    img = open_image(BytesIO(img_bytes))
-    pred, pred_idx, probs = get_learner().predict(img)
-    label, confidence, raw = format_prediction(pred, pred_idx, probs)
-    return JSONResponse({
-        'result': label,
-        'confidence': confidence,
-        'raw_class': raw,
-    })
+    try:
+        img_data = await request.form()
+        img_bytes = await img_data['file'].read()
+        label, confidence, raw = await run_in_threadpool(predict, img_bytes)
+        return JSONResponse({
+            'result': label,
+            'confidence': confidence,
+            'raw_class': raw,
+        })
+    except Exception as exc:
+        return JSONResponse({'error': str(exc)}, status_code=500)
 
 
 app = Starlette(
+    lifespan=lifespan,
     routes=[
         Route('/', homepage),
         Route('/health', health),
