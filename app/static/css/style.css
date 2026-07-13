@@ -51,6 +51,45 @@ body {
       outline: 0;
   }
 
+  .example-covers {
+      margin-top: 2em;
+  }
+
+  .example-cover-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+  }
+
+  .example-cover-card {
+      width: 140px;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .example-cover-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+  }
+
+  .example-cover-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+  }
+
+  .example-cover-card span {
+      display: block;
+      font-size: 0.85rem;
+      color: #666;
+  }
+
 a {
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;

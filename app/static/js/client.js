@@ -14,13 +14,7 @@ function showPicked(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
-function analyze() {
-  var uploadFiles = el("file-input").files;
-  if (uploadFiles.length !== 1) {
-    alert("Please select a file to analyze!");
-    return;
-  }
-
+function submitAnalysis(fileData) {
   el("analyze-button").innerHTML = "Analyzing...";
   el("result-label").innerHTML = "";
 
@@ -59,7 +53,38 @@ function analyze() {
     }
   };
 
+  xhr.send(fileData);
+}
+
+function analyze() {
+  var uploadFiles = el("file-input").files;
+  if (uploadFiles.length !== 1) {
+    alert("Please select a file to analyze!");
+    return;
+  }
+
   var fileData = new FormData();
   fileData.append("file", uploadFiles[0]);
-  xhr.send(fileData);
+  submitAnalysis(fileData);
+}
+
+function tryExample(imagePath, title) {
+  el("upload-label").innerHTML = title;
+  el("image-picked").src = imagePath;
+  el("image-picked").className = "";
+
+  fetch(imagePath)
+    .then(function(response) {
+      if (!response.ok) throw new Error("Could not load example image");
+      return response.blob();
+    })
+    .then(function(blob) {
+      var fileData = new FormData();
+      fileData.append("file", blob, title + ".jpg");
+      submitAnalysis(fileData);
+    })
+    .catch(function() {
+      el("result-label").innerHTML = "Could not load the example cover. Please try again.";
+      el("analyze-button").innerHTML = "Analyze";
+    });
 }
