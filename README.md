@@ -17,7 +17,7 @@ Built as a capstone project for the Machine Learning Guild Apprentice Program.
 
 ## Live demo
 
-**Primary hosting (free):** [book-cover-judger.onrender.com](https://book-cover-judger.onrender.com)
+**Primary hosting (free):** [www.bookcoverjudger.com](https://www.bookcoverjudger.com) (Render: `book-cover-judger-c5bz.onrender.com`)
 
 > **Note:** Render's free tier sleeps after ~15 minutes of inactivity. The first visit after sleep may take 30–90 seconds to load while the server and model start up.
 
@@ -46,22 +46,31 @@ Open http://localhost:10000
 
 | Path | Purpose |
 |------|---------|
-| `app/server.py` | Starlette API + model inference |
+| `app/server.py` | Starlette API routes |
+| `app/inference.py` | ONNX preprocessing + inference |
+| `app/models/book_cover_model.onnx` | v1 production model (~84 MB) |
 | `app/index.html` | Frontend UI |
+| `scripts/export_onnx.py` | Regenerate ONNX from fastai export (dev) |
+| `Dockerfile` | Container for deployment |
+| `render.yaml` | Render free-tier config |
+| `docs/HANDOFF.md` | Agent turnover doc for ML v2 thread |
+
 ## Model file
 
 Production inference uses **ONNX Runtime** (`app/models/book_cover_model.onnx`, ~84MB) — lightweight enough for Render's free tier (512 MB RAM). The original fastai export lives in the [capstone training repo](https://github.com/gtesdahl/mlg-06-capstone).
 
 To regenerate the ONNX file from the capstone model:
 ```bash
-pip install fastai==1.0.61 torch torchvision
+pip install fastai==1.0.61 torch torchvision onnx
 python scripts/export_onnx.py /path/to/final_model_export.pkl
 ```
 
 Training labels are numeric tertiles (`0`, `1`, `2`) mapped to Low/Medium/High at inference time.
-| `Dockerfile` | Container for deployment |
-| `render.yaml` | Render free-tier config |
 
 ## Original capstone
 
 Trained August 2020 for the Machine Learning Guild Apprentice Program. ~44% accuracy on 3-class Goodreads cover popularity prediction.
+
+## Agent handoff (ML v2)
+
+See **[docs/HANDOFF.md](docs/HANDOFF.md)** for full turnover documentation: architecture, v1 model archive, infrastructure, lessons learned, and the recommended Colab roadmap for the next phase.
